@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 GREEN='\033[0;32m'
 NC='\033[0m'
@@ -43,7 +44,9 @@ else
 fi
 
 echo "Начинаем установку Docker..."
-curl -fsSL https://get.docker.com | sh
+if ! command -v docker >/dev/null 2>&1; then
+  curl -fsSL https://get.docker.com | sh
+fi
 
 echo "Подготовка директории для Remnawave..."
 mkdir -p /opt/remnanode
