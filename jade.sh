@@ -32,14 +32,14 @@ if command -v curl >/dev/null 2>&1; then
   echo "curl уже установлен"
 else
   echo "curl не найден, устанавливаем..."
-  apt install curl ufw -y
+  apt install curl -y
 fi
 
 if command -v ufw >/dev/null 2>&1; then
   echo "ufw уже установлен"
 else
   echo "ufw не найден, устанавливаем..."
-  apt install -y
+  apt install ufw -y
 fi
 
 echo "Начинаем установку Docker..."
