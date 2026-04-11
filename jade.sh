@@ -1,11 +1,8 @@
 #!/bin/bash
 set -e
-
 GREEN='\033[0;32m'
 NC='\033[0m'
-
 clear
-# Выводим текст зеленым
 echo -e "${GREEN}"
 cat <<'EOF'
       ____.  _____  ________  ___________
@@ -19,7 +16,6 @@ echo -e "          JADE Node Installer v1.0"
 echo -e "-----------------------------------------${NC}"
 sleep 1
 
-# Проверяем, запущен ли скрипт от root
 if [[ $EUID -ne 0 ]]; then
   echo "Пожалуйста, запустите скрипт от имени sudo/root"
   exit 1
@@ -28,7 +24,6 @@ fi
 echo "Обновляем систему..."
 apt update && apt upgrade -y
 
-# Проверка и установка curl
 if command -v curl >/dev/null 2>&1; then
   echo "curl уже установлен"
 else
@@ -52,18 +47,38 @@ echo "Подготовка директории для Remnawave..."
 mkdir -p /opt/remnanode
 cd /opt/remnanode
 
-echo "Сейчас откроется редактор. Вставьте содержимое docker-compose.yml, сохраните (Ctrl+O, Enter) и выходите (Ctrl+X)"
-sleep 3 # Небольшая пауза, чтобы успеть прочитать текст
-nano docker-compose.yml
+# Запрашиваем порт и секрет
+echo ""
+read -p "Введите порт для ноды (NODE_PORT): " NODE_PORT
+echo ""
+read -p "Введите секретный ключ (SECRET_KEY): " SECRET_KEY
+echo ""
 
-echo "Настройка завершена. Файл находится в /opt/remnanode/docker-compose.yml"
+# Генерируем docker-compose.yml
+cat > /opt/remnanode/docker-compose.yml <<EOF
+services:
+  remnanode:
+    container_name: remnanode
+    hostname: remnanode
+    image: remnawave/node:latest
+    network_mode: host
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    environment:
+      - NODE_PORT=${NODE_PORT}
+      - SECRET_KEY=${SECRET_KEY}
+EOF
 
-PORT=$(grep "NODE_PORT" /opt/remnanode/docker-compose.yml | cut -d'=' -f2)
-
-echo "открываем порт для ноды"
+echo "Файл docker-compose.yml создан в /opt/remnanode/"
+echo "Открываем порт для ноды..."
 ufw allow 22/tcp
 ufw --force enable
-ufw allow $PORT
+ufw allow $NODE_PORT
 
-echo "запускаем контейнер"
-docker compose up -d && docker compose logs remannode
+echo "Запускаем контейнер..."
+docker compose up -d && docker compose logs remnanode
