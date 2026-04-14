@@ -21,9 +21,6 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-echo "Обновляем систему..."
-apt update && apt upgrade -y
-
 if command -v curl >/dev/null 2>&1; then
   echo "curl уже установлен"
 else
