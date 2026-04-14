@@ -52,7 +52,7 @@ read -p "Введите секретный ключ (SECRET_KEY): " SECRET_KEY
 echo ""
 
 # Генерируем docker-compose.yml
-cat > /opt/remnanode/docker-compose.yml <<EOF
+cat >/opt/remnanode/docker-compose.yml <<EOF
 services:
   remnanode:
     container_name: remnanode
@@ -73,9 +73,23 @@ EOF
 
 echo "Файл docker-compose.yml создан в /opt/remnanode/"
 echo "Открываем порт для ноды..."
+
+#Работа с портами
 ufw allow 22/tcp
+ufw allow 443/tcp
 ufw --force enable
 ufw allow $NODE_PORT
+
+#Буст
+echo "net.core.default_qdisc=fq" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >>/etc/sysctl.conf
+echo "nameserver 1.1.1.1"
+
+#DNS
+cat >/etc/resolv.conf <<EOF
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+EOF
 
 echo "Запускаем контейнер..."
 docker compose up -d && docker compose logs remnanode
