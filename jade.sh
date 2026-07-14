@@ -116,6 +116,11 @@ case "$answer" in
 
   if [[ "$WARP_STATUS" =~ "Status update: Connected" ]]; then
     echo "WARP установлен и работает"
+    echo "установка сприпта очищения"
+    echo "warp-cli restart" > /etc/cron.daily/warp-cli-restart
+    chmod +x /etc/cron.daily/warp-cli-restart
+    echo "скрипт установлен"
+    echo "скрипт будет запускаться ежедневно в 00:00"
   else
     echo "ошибка при установке"
     exit 1
