@@ -57,7 +57,7 @@ services:
   remnanode:
     container_name: remnanode
     hostname: remnanode
-    image: remnawave/node:2.8.0
+    image: remnawave/node@sha256:03f14935751b4ab565181e2b1766ccd1a9ac349d6839acd3ee49014e543fa232
     network_mode: host
     restart: always
     cap_add:
